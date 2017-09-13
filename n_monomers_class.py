@@ -48,7 +48,7 @@ class NMonomersSol(object):
         sp_mon = self.species_mon_names(self.model.species)
         # dic whose keys are the index of monomers and the values are the species that contain that monomer as the
         # monomer with highest index
-        mons_polymer = {i: [] for i in range(1, len(self.model.monomers)+1)}
+        mons_polymer = {i: [] for i in range(1, len(self.model.monomers) + 1)}
         for i, j in sp_mon.items():
             mon_idx = self.get_number(i[-1])
             mons_polymer[mon_idx].append(i)
@@ -63,7 +63,7 @@ class NMonomersSol(object):
         df = pd.DataFrame(np.nan, index=range(1, (2 * len(self.model.monomers)) + 1),
                           columns=range(1, len(self.model.monomers) + 1))
         for i, j in mons_polymer.items():
-            df[i].iloc[:len(j)] = j
+            df.loc[:len(j), i] = j
 
         return df
 
@@ -146,37 +146,91 @@ class NMonomersSol(object):
         total_value = b_ld_value - lu_value
         return total_value
 
-    def get_lu_mplus1_sol(self, m):
+    def get_lu_m_sol(self, m):
+        """
+
+        :param m: m goes from 1 to N-1
+        :return:
+        """
         n = len(self.model.monomers)
-        if m == 0 or m >= n:
-            raise ValueError('only values between 1 and n-1 are valid')
-        k_mplus1 = self.model.rules[m - 1].rate_forward.value
-        rr = self.model.rules[m - 1].rate_reverse.value
+        if m <= 0 or m > n:
+            raise ValueError('only values between 1 and n are valid')
+        k_m = self.model.rules[m - 1].rate_forward.value
+        rr = self.model.rules[m - 1].rate_reverse
         if rr:
-            l_mplus1 = rr
+            l_m = rr.value
         else:
-            l_mplus1 = 0
+            l_m = 0
         b_m = self.get_total_monomer(m)
-        b_mplus1 = self.get_total_monomer(m + 1)
-        disc_mplus1 = (k_mplus1*(b_m - b_mplus1) + l_mplus1)**2 + 4*k_mplus1*l_mplus1*b_mplus1
-
         t = sympy.Symbol('t')
-        if disc_mplus1 > 0:
-            xi_ss_mplus1_pos = (-(k_mplus1 * (b_m - b_mplus1) + l_mplus1) + np.sqrt(disc_mplus1)) / (4 * k_mplus1)
-            xi_ss_mplus1_neg = (-(k_mplus1 * (b_m - b_mplus1) + l_mplus1) - np.sqrt(disc_mplus1)) / (4 * k_mplus1)
-            c_mplus1 = (b_mplus1 + xi_ss_mplus1_neg) / (b_mplus1 + xi_ss_mplus1_pos)
-            beta_mplus1 = k_mplus1 * (xi_ss_mplus1_pos - xi_ss_mplus1_neg)
-            xi_ss_mplus1_t = (xi_ss_mplus1_pos - c_mplus1 * xi_ss_mplus1_neg * sympy.exp(-beta_mplus1 * t)) / \
-                             (1 - c_mplus1 * sympy.exp(beta_mplus1 * t))
-            return xi_ss_mplus1_t
+        if m == 1:
+            disc_1 = l_m ** 2 + 8 * k_m * l_m * b_m
+            if disc_1 > 0:
+                xi_ss_1_pos = (-l_m + np.sqrt(disc_1)) / (4 * k_m)
+                xi_ss_1_neg = (-l_m - np.sqrt(disc_1)) / (4 * k_m)
 
-        elif disc_mplus1 == 0:
-            # xi_ss_mplus1 = 0
-            xi_ss_mplus1_t = b_mplus1 / (k_mplus1 * b_mplus1 * t + 1)
-            return xi_ss_mplus1_t
+                c_1 = (b_m - xi_ss_1_pos) / (b_m - xi_ss_1_neg)
+                beta1 = k_m * (xi_ss_1_pos - xi_ss_1_neg)
+                xi_1_t = (xi_ss_1_pos - c_1 * xi_ss_1_neg * sympy.exp(-beta1 * t)) / \
+                         (1 - c_1 * sympy.exp(-beta1 * t))
+                return xi_1_t, [xi_ss_1_pos, xi_ss_1_neg]
+
+            elif disc_1 == 0:
+                xi_ss_1 = 0
+                xi_1_t = b_m / (k_m * b_m * t + 1)
+                return xi_ss_1, xi_1_t
+            else:
+                raise Exception('there must be something wrong with your model, check parameter values')
+
+        elif 1 < m < n:
+            b_minus1 = self.get_total_monomer(m - 1)
+
+            disc_mplus1 = (k_m * (b_minus1 - b_m) + l_m) ** 2 + 4 * k_m * l_m * b_m
+            if disc_mplus1 > 0:
+                xi_ss_mplus1_pos = (-(k_m * (b_minus1 - b_m) + l_m) + np.sqrt(disc_mplus1)) / (2 * k_m)
+                xi_ss_mplus1_neg = (-(k_m * (b_minus1 - b_m) + l_m) - np.sqrt(disc_mplus1)) / (2 * k_m)
+
+                c_mplus1 = (b_m - xi_ss_mplus1_pos) / (b_m - xi_ss_mplus1_neg)
+                beta_mplus1 = k_m * (xi_ss_mplus1_pos - xi_ss_mplus1_neg)
+                xi_mplus1_t = (xi_ss_mplus1_pos - c_mplus1 * xi_ss_mplus1_neg * sympy.exp(-beta_mplus1 * t)) / \
+                              (1 - c_mplus1 * sympy.exp(-beta_mplus1 * t))
+                return xi_mplus1_t, [xi_ss_mplus1_pos, xi_ss_mplus1_neg]
+
+            elif disc_mplus1 == 0:
+                xi_ss_mplus1 = 0
+                xi_mplus1_t = b_m / (k_m * b_m * t + 1)
+                return xi_mplus1_t, xi_ss_mplus1
+            else:
+                raise Exception('there must be something wrong with your model, check parameter values')
+        elif m == n:
+            b_minus1 = self.get_total_monomer(m - 1)
+
+            disc_n = ((k_m * (b_minus1 - b_m) + l_m) ** 2) + (4 * k_m * l_m * b_m)
+            if disc_n > 0:
+                xi_ss_n_pos = (-(k_m * (b_minus1 - b_m) + l_m) + np.sqrt(disc_n)) / (2 * k_m)
+                xi_ss_n_neg = (-(k_m * (b_minus1 - b_m) + l_m) - np.sqrt(disc_n)) / (2 * k_m)
+
+                c_n = (b_m - xi_ss_n_pos) / (b_m - xi_ss_n_neg)
+                beta_n = k_m * (xi_ss_n_pos - xi_ss_n_neg)
+                xi_n_t = (xi_ss_n_pos - c_n * xi_ss_n_neg * sympy.exp(-beta_n * t)) / \
+                         (1 - c_n * sympy.exp(-beta_n * t))
+                return xi_n_t, [xi_ss_n_pos, xi_ss_n_neg]
+
+            elif disc_n == 0:
+                xi_ss_n = 0
+                xi_n_t = b_m / (k_m * b_m * t + 1)
+                return xi_n_t, xi_ss_n
 
     def get_eta_m(self, m):
         b_m = self.get_total_monomer(m)
-        b_mplus1 = self.get_total_monomer(m + 1)
-        eta_m = b_m - b_mplus1 + self.get_lu_mplus1_sol(m)
-        return eta_m
+        n = len(self.model.monomers)
+        if 1 <= m < n-1:
+            b_mplus1 = self.get_total_monomer(m + 1)
+            xi_ss_mplus1_t, xi_ss_mplus1_pos, xi_ss_mplus1_neg = self.get_lu_m_sol(m)
+            eta_m = b_m - b_mplus1 + xi_ss_mplus1_t
+            eta_m_ss_pos = b_m - b_mplus1 + xi_ss_mplus1_pos
+            eta_m_ss_neg = b_m - b_mplus1 + xi_ss_mplus1_neg
+            return eta_m, [eta_m_ss_pos, eta_m_ss_neg]
+        elif m == n:
+            return b_m
+
