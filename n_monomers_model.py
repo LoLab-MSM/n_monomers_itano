@@ -86,9 +86,9 @@ def update_initial_conditions(model, species):
 def update_kinetic_parameters(model, kpar):
     """
 
-    :param model: model whose initial conditions are going to be updated
-    :param kpar: species to update their initial conditions, can be a dict with keys as species' indices or
-    complex patterns and values as the new initial conditions levels
+    :param model: model whose kinetic parameters are going to be updated
+    :param kpar: kinetic parameters to update their values, can be a dict with keys as parameters' indices or
+    parameter names (str) and values as the new parameter values
     :return:
     """
 
