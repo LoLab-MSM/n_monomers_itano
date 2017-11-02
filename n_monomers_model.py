@@ -3,6 +3,17 @@ from pysb.core import ComplexPattern
 
 
 def generate_n_monomers_model(n_mons):
+    """
+    Create a pysb.Model with the rules to create symmetric polymers
+    Parameters
+    ----------
+    n_mons : int
+        The number of monomers that are going to be used to create the polymer
+
+    Returns
+    -------
+
+    """
     def n_monomers_model(n):
         monomers = ['b_{0}'.format(i) for i in range(1, n + 1)]
         mons = [0] * n
@@ -62,10 +73,17 @@ def generate_n_monomers_model(n_mons):
 def update_initial_conditions(model, species):
     """
 
-    :param model: model whose initial conditions are going to be updated
-    :param species: species to update their initial conditions, can be a dict with keys as species' indices or
-    complex patterns and values as the new initial conditions levels
-    :return:
+    Parameters
+    ----------
+    model : pysb.Model
+        The model whose initial conditions are going to be updated
+    species: dict
+        A dictionary where the keys can be the species indices or pysb.ComplexPatterns, and the values are the new
+        initial conditions levels
+
+    Returns
+    -------
+
     """
 
     if all(isinstance(x, int) for x in species.keys()):
@@ -81,15 +99,22 @@ def update_initial_conditions(model, species):
                 print('Complex pattern ' + str(cp) + 'is not in the list of the initials conditions of the model')
     else:
         raise TypeError('Mixed indices and complex pattern argument is not supported')
-
+    return
 
 def update_kinetic_parameters(model, kpar):
     """
 
-    :param model: model whose kinetic parameters are going to be updated
-    :param kpar: kinetic parameters to update their values, can be a dict with keys as parameters' indices or
-    parameter names (str) and values as the new parameter values
-    :return:
+    Parameters
+    ----------
+    model : pysb.Model
+        The PysB model whose kinetic parameters are going to be updated
+    kpar : dict
+        A dictionary whose keys are the parameters' indices or parameters names (str) and values are the new
+        parameter values
+
+    Returns
+    -------
+
     """
 
     if all(isinstance(x, int) for x in kpar.keys()):
@@ -103,3 +128,4 @@ def update_kinetic_parameters(model, kpar):
 
     else:
         raise TypeError('Mixed indices and complex pattern argument is not supported')
+    return
