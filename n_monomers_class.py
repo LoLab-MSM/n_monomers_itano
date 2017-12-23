@@ -364,6 +364,7 @@ class NMonomersSol(object):
         f2 = k_N * xi_N * xi_N_1 + l_N_1 * (eta_N - xi_N)
         species_ss[self.x_lm_to_cp[(2, N)]] = f2 / A2
 
+        # Gettin L_m
         m_range = range1(2, N - 2)
         for m in m_range:
             k_m = self.model.rules[m - 1].rate_forward.value
@@ -374,6 +375,7 @@ class NMonomersSol(object):
             eta_mminus1 = self.get_eta_m(m - 1)[1][0]
             xi_m = self.get_lu_m_sol(m)[1][0]
             eta_m = self.get_eta_m(m)[1][0]
+
             i_range = range1(1, N - m + 1)
             for i in i_range:
                 pol_l = i
@@ -417,6 +419,28 @@ class NMonomersSol(object):
                     f_l_m = k_x_x_dot + l_mplusi * (xi_m - sum(x_j_mj1_sum)) + l_m * (eta_mplusi - sum(x_j_mi1_sum))
                     sol = f_l_m / A_l_m
                     species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = sol
+
+                if i == N - m + 1:
+                    l_j_isum = 0
+                    for j in range1(0, N-m):
+                        l_c = self.model.rules[(m-1) + j].rate_reverse  # the last rule doesnt always have a reverse reaction
+                        if l_c:
+                            l_r = l_c.value
+                        else:
+                            l_r = 0
+                        l_j_isum += l_r
+                    A_l_m = k_m * eta_mminus1 + l_j_isum
+
+                    k_mj_sum = [self.model.rules[(m-1) + j].rate_forward.value for j in range1(1, N-m)]
+                    x_j_mj1_sum = [species_ss[self.x_lm_to_cp[(j, m+j-1)]]for j in range1(1, N-m)]
+                    x_Nm1j_N_sum = [species_ss[self.x_lm_to_cp[(N-m+1-j, N)]]for j in range1(1, N-m)]
+                    x_j_N_sum = [species_ss[self.x_lm_to_cp[(j, N)]] for j in range1(1, N-m)]
+                    k_x_x_dot = dot3(k_mj_sum, x_j_mj1_sum, x_Nm1j_N_sum)
+                    f_l_m = k_x_x_dot + l_m * (eta_N - sum(x_j_N_sum))
+                    sol = f_l_m / A_l_m
+                    species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = sol
+
+        # Getting LU_1
 
 
         return species_ss
