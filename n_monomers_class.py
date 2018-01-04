@@ -9,6 +9,7 @@ import sympy
 def range1(start, end):
     return range(start, end + 1)
 
+
 def dot3(a, b, c):
     return sum(i * j * k for i, j, k in zip(a, b, c))
 
@@ -20,6 +21,7 @@ class NMonomersSol(object):
     model : pysb.Model
         Model to be analyzed
     """
+
     def __init__(self, model):
         self.model = model
         if not self.model.species:
@@ -154,7 +156,7 @@ class NMonomersSol(object):
         idx = [i for i, x in enumerate(ic) if x.is_equivalent_to(cp)]
         if not idx:
             cp_idx = self.model.get_species_index(cp)
-            ic_value = Parameter('b_{0}_0'.format(cp_idx+1), 0)
+            ic_value = Parameter('b_{0}_0'.format(cp_idx + 1), 0)
             Initial(cp, ic_value)
 
         else:
@@ -243,7 +245,7 @@ class NMonomersSol(object):
                 xi_1_t = (xi_ss_1_pos - c_1 * xi_ss_1_neg * sympy.exp(-beta1 * t)) / \
                          (1 - c_1 * sympy.exp(-beta1 * t))
                 xi_1_t_symb = (xi_ss_1_pos_symb - c_1_symb * xi_ss_1_neg_symb * sympy.exp(-beta1_symb * t)) / \
-                         (1 - c_1_symb * sympy.exp(-beta1_symb * t))
+                              (1 - c_1_symb * sympy.exp(-beta1_symb * t))
                 return [xi_1_t, xi_1_t_symb], np.array([xi_ss_1_pos, xi_ss_1_neg, xi_ss_1_pos_symb, xi_ss_1_neg_symb])
 
             elif disc_1 == 0:
@@ -259,7 +261,8 @@ class NMonomersSol(object):
             b_minus1_symb = self.get_total_monomer(m - 1)[1]
 
             disc_mplus1 = (k_m * (b_minus1 - b_m) + l_m) ** 2 + 4 * k_m * l_m * b_m
-            disc_mplus1_symb = (k_m_symb * (b_minus1_symb - b_m_symb) + l_m_symb) ** 2 + 4 * k_m_symb * l_m_symb * b_m_symb
+            disc_mplus1_symb = (k_m_symb * (
+            b_minus1_symb - b_m_symb) + l_m_symb) ** 2 + 4 * k_m_symb * l_m_symb * b_m_symb
             if disc_mplus1 > 0:
                 xi_ss_mplus1_pos = (-(k_m * (b_minus1 - b_m) + l_m) + np.sqrt(disc_mplus1)) / (2 * k_m)
                 xi_ss_mplus1_neg = (-(k_m * (b_minus1 - b_m) + l_m) - np.sqrt(disc_mplus1)) / (2 * k_m)
@@ -274,9 +277,11 @@ class NMonomersSol(object):
                 beta_mplus1_symb = k_m_symb * (xi_ss_mplus1_pos_symb - xi_ss_mplus1_neg_symb)
                 xi_mplus1_t = (xi_ss_mplus1_pos - c_mplus1 * xi_ss_mplus1_neg * sympy.exp(-beta_mplus1 * t)) / \
                               (1 - c_mplus1 * sympy.exp(-beta_mplus1 * t))
-                xi_mplus1_t_symb = (xi_ss_mplus1_pos_symb - c_mplus1_symb * xi_ss_mplus1_neg_symb * sympy.exp(-beta_mplus1_symb * t)) / \
-                              (1 - c_mplus1_symb * sympy.exp(-beta_mplus1_symb * t))
-                return [xi_mplus1_t, xi_mplus1_t_symb], np.array([xi_ss_mplus1_pos, xi_ss_mplus1_neg, xi_ss_mplus1_pos_symb, xi_ss_mplus1_neg_symb])
+                xi_mplus1_t_symb = (xi_ss_mplus1_pos_symb - c_mplus1_symb * xi_ss_mplus1_neg_symb * sympy.exp(
+                    -beta_mplus1_symb * t)) / \
+                                   (1 - c_mplus1_symb * sympy.exp(-beta_mplus1_symb * t))
+                return [xi_mplus1_t, xi_mplus1_t_symb], np.array(
+                    [xi_ss_mplus1_pos, xi_ss_mplus1_neg, xi_ss_mplus1_pos_symb, xi_ss_mplus1_neg_symb])
 
             elif disc_mplus1 == 0:
                 xi_ss_mplus1 = 0
@@ -290,12 +295,15 @@ class NMonomersSol(object):
             b_minus1_symb = self.get_total_monomer(m - 1)[1]
 
             disc_n = ((k_m * (b_minus1 - b_m) + l_m) ** 2) + (4 * k_m * l_m * b_m)
-            disc_n_symb = ((k_m_symb * (b_minus1_symb - b_m_symb) + l_m_symb) ** 2) + (4 * k_m_symb * l_m_symb * b_m_symb)
+            disc_n_symb = ((k_m_symb * (b_minus1_symb - b_m_symb) + l_m_symb) ** 2) + (
+            4 * k_m_symb * l_m_symb * b_m_symb)
             if disc_n > 0:
                 xi_ss_n_pos = (-(k_m * (b_minus1 - b_m) + l_m) + np.sqrt(disc_n)) / (2 * k_m)
                 xi_ss_n_neg = (-(k_m * (b_minus1 - b_m) + l_m) - np.sqrt(disc_n)) / (2 * k_m)
-                xi_ss_n_pos_symb = (-(k_m_symb * (b_minus1_symb - b_m_symb) + l_m_symb) + sympy.sqrt(disc_n_symb)) / (2 * k_m_symb)
-                xi_ss_n_neg_symb = (-(k_m_symb * (b_minus1_symb - b_m_symb) + l_m_symb) - sympy.sqrt(disc_n_symb)) / (2 * k_m_symb)
+                xi_ss_n_pos_symb = (-(k_m_symb * (b_minus1_symb - b_m_symb) + l_m_symb) + sympy.sqrt(disc_n_symb)) / (
+                2 * k_m_symb)
+                xi_ss_n_neg_symb = (-(k_m_symb * (b_minus1_symb - b_m_symb) + l_m_symb) - sympy.sqrt(disc_n_symb)) / (
+                2 * k_m_symb)
 
                 c_n = (b_m - xi_ss_n_pos) / (b_m - xi_ss_n_neg)
                 c_n_symb = (b_m_symb - xi_ss_n_pos_symb) / (b_m_symb - xi_ss_n_neg_symb)
@@ -304,7 +312,7 @@ class NMonomersSol(object):
                 xi_n_t = (xi_ss_n_pos - c_n * xi_ss_n_neg * sympy.exp(-beta_n * t)) / \
                          (1 - c_n * sympy.exp(-beta_n * t))
                 xi_n_t_symb = (xi_ss_n_pos_symb - c_n_symb * xi_ss_n_neg_symb * sympy.exp(-beta_n_symb * t)) / \
-                         (1 - c_n_symb * sympy.exp(-beta_n_symb * t))
+                              (1 - c_n_symb * sympy.exp(-beta_n_symb * t))
                 return [xi_n_t, xi_n_t_symb], np.array([xi_ss_n_pos, xi_ss_n_neg, xi_ss_n_pos_symb, xi_ss_n_neg_symb])
 
             elif disc_n == 0:
@@ -342,19 +350,19 @@ class NMonomersSol(object):
 
         # LU_N-1 is a special case as well
         # for X(1, N-1) i = 1
-        k_N = self.model.rules[N-1].rate_forward.value
-        k_N_1 = self.model.rules[N-2].rate_forward.value
-        l_N_c = self.model.rules[N-1].rate_reverse # the last rule doesnt always have a reverse reaction
+        k_N = self.model.rules[N - 1].rate_forward.value
+        k_N_1 = self.model.rules[N - 2].rate_forward.value
+        l_N_c = self.model.rules[N - 1].rate_reverse  # the last rule doesnt always have a reverse reaction
         if l_N_c:
             l_N = l_N_c.value
         else:
             l_N = 0
-        l_N_1 = self.model.rules[N-2].rate_reverse.value
+        l_N_1 = self.model.rules[N - 2].rate_reverse.value
         xi_N = self.get_lu_m_sol(N)[1][0]
-        xi_N_1 = self.get_lu_m_sol(N-1)[1][0]
+        xi_N_1 = self.get_lu_m_sol(N - 1)[1][0]
         eta_N = self.get_eta_m(N)
-        eta_N_1 = self.get_eta_m(N-1)[1][0]
-        eta_N_2 = self.get_eta_m(N-2)[1][0]
+        eta_N_1 = self.get_eta_m(N - 1)[1][0]
+        eta_N_2 = self.get_eta_m(N - 2)[1][0]
 
         A1 = k_N * xi_N + k_N_1 * eta_N_2 + l_N + l_N_1
         f1 = l_N * xi_N_1 + l_N_1 * eta_N_1
@@ -388,12 +396,13 @@ class NMonomersSol(object):
                     species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = sol
 
                 if i in range1(2, N - m):
-                    k_mplusi = self.model.rules[(m-1) + i].rate_forward.value
-                    xi_mplusi = self.get_lu_m_sol(m+i)[1][0]
+                    k_mplusi = self.model.rules[(m - 1) + i].rate_forward.value
+                    xi_mplusi = self.get_lu_m_sol(m + i)[1][0]
 
                     l_j_isum = 0
                     for j in range1(0, i):
-                        l_c = self.model.rules[(m-1) + j].rate_reverse  # the last rule doesnt always have a reverse reaction
+                        l_c = self.model.rules[
+                            (m - 1) + j].rate_reverse  # the last rule doesnt always have a reverse reaction
                         if l_c:
                             l_r = l_c.value
                         else:
@@ -401,19 +410,19 @@ class NMonomersSol(object):
                         l_j_isum += l_r
                     A_l_m = k_mplusi * xi_mplusi + k_m * eta_mminus1 + l_j_isum
 
-                    k_mj_sum = [self.model.rules[(m-1) + j].rate_forward.value for j in range1(1, i-1)]
-                    x_ij_mi1_sum = [species_ss[self.x_lm_to_cp[(i-j, m+i-1)]]for j in range1(1, i-1)]
-                    x_j_mj1_sum = [species_ss[self.x_lm_to_cp[(j, m+j-1)]]for j in range1(1, i-1)]
+                    k_mj_sum = [self.model.rules[(m - 1) + j].rate_forward.value for j in range1(1, i - 1)]
+                    x_ij_mi1_sum = [species_ss[self.x_lm_to_cp[(i - j, m + i - 1)]] for j in range1(1, i - 1)]
+                    x_j_mj1_sum = [species_ss[self.x_lm_to_cp[(j, m + j - 1)]] for j in range1(1, i - 1)]
                     x_j_mi1_sum = [species_ss[self.x_lm_to_cp[(j, m + i - 1)]] for j in range1(1, i - 1)]
                     k_x_x_dot = dot3(k_mj_sum, x_ij_mi1_sum, x_j_mj1_sum)
-                    l_mplusi_c = self.model.rules[(m-1)+i].rate_reverse
+                    l_mplusi_c = self.model.rules[(m - 1) + i].rate_reverse
                     if l_mplusi_c:
                         l_mplusi = l_mplusi_c.value
                     else:
                         l_mplusi = 0
 
-                    if (m+i) == N:
-                        eta_mplusi = self.get_eta_m(m+i)
+                    if (m + i) == N:
+                        eta_mplusi = self.get_eta_m(m + i)
                     else:
                         eta_mplusi = self.get_eta_m(m + i)[1][0]
                     f_l_m = k_x_x_dot + l_mplusi * (xi_m - sum(x_j_mj1_sum)) + l_m * (eta_mplusi - sum(x_j_mi1_sum))
@@ -422,8 +431,9 @@ class NMonomersSol(object):
 
                 if i == N - m + 1:
                     l_j_isum = 0
-                    for j in range1(0, N-m):
-                        l_c = self.model.rules[(m-1) + j].rate_reverse  # the last rule doesnt always have a reverse reaction
+                    for j in range1(0, N - m):
+                        l_c = self.model.rules[
+                            (m - 1) + j].rate_reverse  # the last rule doesnt always have a reverse reaction
                         if l_c:
                             l_r = l_c.value
                         else:
@@ -431,17 +441,97 @@ class NMonomersSol(object):
                         l_j_isum += l_r
                     A_l_m = k_m * eta_mminus1 + l_j_isum
 
-                    k_mj_sum = [self.model.rules[(m-1) + j].rate_forward.value for j in range1(1, N-m)]
-                    x_j_mj1_sum = [species_ss[self.x_lm_to_cp[(j, m+j-1)]]for j in range1(1, N-m)]
-                    x_Nm1j_N_sum = [species_ss[self.x_lm_to_cp[(N-m+1-j, N)]]for j in range1(1, N-m)]
-                    x_j_N_sum = [species_ss[self.x_lm_to_cp[(j, N)]] for j in range1(1, N-m)]
+                    k_mj_sum = [self.model.rules[(m - 1) + j].rate_forward.value for j in range1(1, N - m)]
+                    x_j_mj1_sum = [species_ss[self.x_lm_to_cp[(j, m + j - 1)]] for j in range1(1, N - m)]
+                    x_Nm1j_N_sum = [species_ss[self.x_lm_to_cp[(N - m + 1 - j, N)]] for j in range1(1, N - m)]
+                    x_j_N_sum = [species_ss[self.x_lm_to_cp[(j, N)]] for j in range1(1, N - m)]
                     k_x_x_dot = dot3(k_mj_sum, x_j_mj1_sum, x_Nm1j_N_sum)
                     f_l_m = k_x_x_dot + l_m * (eta_N - sum(x_j_N_sum))
                     sol = f_l_m / A_l_m
                     species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = sol
 
         # Getting LU_1
+        # i = 1
+        k_1 = self.model.rules[1 - 1].rate_forward.value
+        k_2 = self.model.rules[2 - 1].rate_forward.value
+        xi_1 = self.get_lu_m_sol(1)[1][0]
+        xi_2 = self.get_lu_m_sol(2)[1][0]
+        eta_1 = self.get_eta_m(1)[1][0]
 
+        l_1c = self.model.rules[1 - 1].rate_reverse  # the last rule doesnt always have a reverse reaction
+        if l_1c:
+            l_1 = l_1c.value
+        else:
+            l_1 = 0
+
+        l_2c = self.model.rules[2 - 1].rate_reverse  # the last rule doesnt always have a reverse reaction
+        if l_2c:
+            l_2 = l_2c.value
+        else:
+            l_2 = 0
+        l_j_2sum = l_1 + l_2
+
+        A_1_1 = 2 * k_1 * xi_1 + 2 * k_2 * xi_2 + l_j_2sum
+        f_1_1 = l_1 * eta_1 + l_2 * xi_1
+        sol = f_1_1 / A_1_1
+        species_ss[self.x_lm_to_cp[(1, 1)]] = sol
+
+        # Getting LU_i (i=2, ..., N-1)
+        for i in range1(2, N - 1):
+            k_iplus1 = self.model.rules[i].rate_forward.value
+            xi_iplus1 = self.get_lu_m_sol(i + 1)[1][0]
+            k_j_iminu1_sum = [self.model.rules[(j + 1) - 1].rate_forward.value for j in range1(1, i - 1)]
+            x_jj_jiminus1_sum = [species_ss[self.x_lm_to_cp[(j, j)]] for j in range1(1, i - 1)]
+            x_iminusji_jiminus1_sum = [species_ss[self.x_lm_to_cp[(i - j, i)]] for j in range1(1, i - 1)]
+            x_ji_jiminus1 = [species_ss[self.x_lm_to_cp[(j, i)]] for j in range1(1, i - 1)]
+            b_i = self.get_total_monomer(i)[0]
+            b_iplus1 = self.get_total_monomer(i + 1)[0]
+            k_x_x_dot = dot3(k_j_iminu1_sum, x_jj_jiminus1_sum, x_iminusji_jiminus1_sum)
+
+            l_iplus1c = self.model.rules[(i + 1) - 1].rate_reverse  # the last rule doesnt always have a reverse reaction
+            if l_iplus1c:
+                l_iplus1 = l_iplus1c.value
+            else:
+                l_iplus1 = 0
+
+            l_j_iplus1sum = 0
+            for j in range1(1, i + 1):
+                l_c = self.model.rules[(j - 1)].rate_reverse  # the last rule doesnt always have a reverse reaction
+                if l_c:
+                    l_r = l_c.value
+                else:
+                    l_r = 0
+                l_j_iplus1sum += l_r
+
+            A_i_i = 2 * k_1 * xi_1 + k_iplus1 + xi_iplus1 + l_j_iplus1sum
+
+            f_i_i = k_x_x_dot + l_iplus1 * (eta_1 - sum(x_jj_jiminus1_sum)) + \
+                    l_1 * (b_i - b_iplus1 + xi_iplus1 - sum(x_ji_jiminus1))
+
+            sol = f_i_i / A_i_i
+            species_ss[self.x_lm_to_cp[(i, i)]] = sol
+
+        # LU_N
+        l_j_nsum = 0
+        for j in range1(1, N):
+            l_c = self.model.rules[(j - 1)].rate_reverse  # the last rule doesnt always have a reverse reaction
+            if l_c:
+                l_r = l_c.value
+            else:
+                l_r = 0
+            l_j_nsum += l_r
+
+        k_j_Nminu1_sum = [self.model.rules[(j + 1) - 1].rate_forward.value for j in range1(1, N - 1)]
+        x_jj_jNminus1_sum = [species_ss[self.x_lm_to_cp[(j, j)]] for j in range1(1, N - 1)]
+        x_iminusji_jNminus1_sum = [species_ss[self.x_lm_to_cp[(N - j, N)]] for j in range1(1, N - 1)]
+        x_jN_jNminus1 = [species_ss[self.x_lm_to_cp[(j, N)]] for j in range1(1, N - 1)]
+        k_x_x_N_dot = dot3(k_j_Nminu1_sum, x_jj_jNminus1_sum, x_iminusji_jNminus1_sum)
+        b_N = self.get_total_monomer(N)[0]
+        A_N_N = 2 * k_1 * xi_1 + l_j_nsum
+
+        f_N_N = k_x_x_N_dot + l_1 * (b_N - sum(x_jN_jNminus1))
+        sol = f_N_N / A_N_N
+        species_ss[self.x_lm_to_cp[(N, N)]] = sol
 
         return species_ss
         #             ls = [self.model.rules[(m-1) + j].rate_reverse.value for j in range1(0, i)]
