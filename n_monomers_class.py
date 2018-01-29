@@ -392,8 +392,7 @@ class NMonomersSol(object):
                     # Getting A(1, m+1-1)
                     A_l_m = k_mplus1 * xi_mplus1 + k_m * eta_mminus1 + l_mplus1 + l_m
                     f_l_m = l_mplus1 * xi_m + l_m * eta_m
-                    sol = f_l_m / A_l_m
-                    species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = sol
+                    species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = f_l_m / A_l_m
 
                 if i in range1(2, N - m):
                     k_mplusi = self.model.rules[(m - 1) + i].rate_forward.value
@@ -426,8 +425,7 @@ class NMonomersSol(object):
                     else:
                         eta_mplusi = self.get_eta_m(m + i)[1][0]
                     f_l_m = k_x_x_dot + l_mplusi * (xi_m - sum(x_j_mj1_sum)) + l_m * (eta_mplusi - sum(x_j_mi1_sum))
-                    sol = f_l_m / A_l_m
-                    species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = sol
+                    species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = f_l_m / A_l_m
 
                 if i == N - m + 1:
                     l_j_isum = 0
@@ -447,8 +445,7 @@ class NMonomersSol(object):
                     x_j_N_sum = [species_ss[self.x_lm_to_cp[(j, N)]] for j in range1(1, N - m)]
                     k_x_x_dot = dot3(k_mj_sum, x_j_mj1_sum, x_Nm1j_N_sum)
                     f_l_m = k_x_x_dot + l_m * (eta_N - sum(x_j_N_sum))
-                    sol = f_l_m / A_l_m
-                    species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = sol
+                    species_ss[self.x_lm_to_cp[(pol_l, pol_m)]] = f_l_m / A_l_m
 
         # Getting LU_1
         # i = 1
@@ -473,10 +470,9 @@ class NMonomersSol(object):
 
         A_1_1 = 2 * k_1 * xi_1 + 2 * k_2 * xi_2 + l_j_2sum
         f_1_1 = l_1 * eta_1 + l_2 * xi_1
-        sol = f_1_1 / A_1_1
-        species_ss[self.x_lm_to_cp[(1, 1)]] = sol
+        species_ss[self.x_lm_to_cp[(1, 1)]] = f_1_1 / A_1_1
 
-        # Getting LU_i (i=2, ..., N-1)
+        # Getting LU1_i (i=2, ..., N-1)
         for i in range1(2, N - 1):
             k_iplus1 = self.model.rules[i].rate_forward.value
             xi_iplus1 = self.get_lu_m_sol(i + 1)[1][0]
@@ -508,10 +504,9 @@ class NMonomersSol(object):
             f_i_i = k_x_x_dot + l_iplus1 * (eta_1 - sum(x_jj_jiminus1_sum)) + \
                     l_1 * (b_i - b_iplus1 + xi_iplus1 - sum(x_ji_jiminus1))
 
-            sol = f_i_i / A_i_i
-            species_ss[self.x_lm_to_cp[(i, i)]] = sol
+            species_ss[self.x_lm_to_cp[(i, i)]] = f_i_i / A_i_i
 
-        # LU_N
+        # LU1_N
         l_j_nsum = 0
         for j in range1(1, N):
             l_c = self.model.rules[(j - 1)].rate_reverse  # the last rule doesnt always have a reverse reaction
@@ -530,38 +525,38 @@ class NMonomersSol(object):
         A_N_N = 2 * k_1 * xi_1 + l_j_nsum
 
         f_N_N = k_x_x_N_dot + l_1 * (b_N - sum(x_jN_jNminus1))
-        sol = f_N_N / A_N_N
-        species_ss[self.x_lm_to_cp[(N, N)]] = sol
+        species_ss[self.x_lm_to_cp[(N, N)]] = f_N_N / A_N_N
+
+        # L_D group
+
+        # LD1 group
+        # i = 1
+        A_2_1 = 2 * k_2 * xi_2 + 2 * l_2 + l_1
+        x_1_1 = species_ss[self.x_lm_to_cp[(1, 1)]]
+        x_2_1 = species_ss[self.x_lm_to_cp[(2, 1)]]
+        f_2_1 = 2 * k_1 * x_1_1 + l_2 * (eta_1 - x_1_1)
+        species_ss[self.x_lm_to_cp[(2, 1)]] = f_2_1 / A_2_1
+
+        # (i=2, ..., N - 1)
+        for i in range1(2, N - 1):
+            xi_iplus1 = self.get_lu_m_sol(i + 1)[1][0]
+            x_iminusj_i = species_ss[self.x_lm_to_cp[(i - j, i)]]
+
+            k_iplus1 = self.model.rules[i].rate_forward.value
+            l_j3_iplus1 = 0
+            for j in range1(3, i + 1):
+                l_c = self.model.rules[(j - 1)].rate_reverse  # the last rule doesnt always have a reverse reaction
+                if l_c:
+                    l_r = l_c.value
+                else:
+                    l_r = 0
+                l_j3_iplus1 += l_r
+
+            x_i_i = species_ss[self.x_lm_to_cp[(i, i)]]
+
+            A_iplus1_i = k_2 * xi_2 + k_iplus1 * xi_iplus1 + l_1 + 2 * l_2 + l_j3_iplus1
+
+
+
 
         return species_ss
-        #             ls = [self.model.rules[(m-1) + j].rate_reverse.value for j in range1(0, i)]
-        #             xi_mplus1_ss = self.get_lu_m_sol(m + i)[1]
-        #             eta_mminus1_ss = self.get_eta_m(m - 1)[1]
-        #             A_l_m = k_mplus1*xi_mplus1_ss + k_m*eta_mminus1_ss + sum(ls)
-        #
-        #             # Getting f(1, m+1-1)
-        #             l_m = self.model.rules[m-1].rate_reverse.value
-        #             l_mplus1 = self.model.rules[m].rate_reverse.value
-        #             xi_m_ss = self.get_lu_m_sol(m)
-        #             eta_m_ss = self.get_eta_m(m)
-        #             f_l_m = l_mplus1 * xi_m_ss + l_m * eta_m_ss
-        #
-        #         if 2 <= i < N - m + 1:
-        #             # Getting A(i, m+i-1)
-        #             k_m = self.model.rules[m-1].rate_forward.value
-        #             k_mplusi = self.model.rules[(m - 1) + i].rate_forward.value
-        #             ls = [self.model.rules[m + j].rate_reverse.value for j in range1(0, i)]
-        #             xi_mplusi_ss = self.get_lu_m_sol(m + i)[1]
-        #             eta_mminus1_ss = self.get_eta_m(m - 1)[1]
-        #             A_l_m = k_mplusi*xi_mplusi_ss + k_m*eta_mminus1_ss + sum(ls)
-        #
-        #             # Getting f(i, m+i-1)
-        #             k_m_j = [self.model.rules[(m-1) + j] for j in range1(1, i-1)]
-        #             x_l_mminusj = [self.x_lm_to_cp[tuple(pol_l, pol_m - j)] for j in range1(1, i-1)]
-        #             x_mjminus1_j = [self.x_lm_to_cp[tuple(m+j-1, j)] for j in range1(1, i-1)]
-        #             x_l_
-        #
-        #         else:
-        #             ls = [self.model.rules[m + j].rate_reverse.value for j in range1(1, N - m)]
-        #             A_l_m = k_m*eta_mminus1_ss + sum(ls)
-        #
