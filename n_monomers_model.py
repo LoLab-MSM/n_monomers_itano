@@ -47,7 +47,7 @@ def generate_n_monomers_model(n_mons):
             if i == 0:
                 m1_site = mon[i].sites[1]
                 Rule('rule_{0}'.format(i + 1),
-                     mon[i]({m1_site: None}) + mon[i]({m1_site: None}) <> mon[i]({m1_site: 1}) %
+                     mon[i]({m1_site: None}) + mon[i]({m1_site: None}) | mon[i]({m1_site: 1}) %
                      mon[i]({m1_site: 1}), pars[i], pars[i + 1])
 
             elif i == n - 1:
@@ -61,7 +61,7 @@ def generate_n_monomers_model(n_mons):
                 m1_site = mon[i].sites[1]
                 m2_site = mon[i - 1].sites[0]
                 Rule('rule_{0}'.format(i + 1),
-                     mon[i]({m1_site: None}) + mon[i - 1]({m2_site: None}) <> mon[i]({m1_site: 1}) %
+                     mon[i]({m1_site: None}) + mon[i - 1]({m2_site: None}) | mon[i]({m1_site: 1}) %
                      mon[i - 1]({m2_site: 1}), pars[2 * i], pars[(2 * i) + 1])
         return
 
