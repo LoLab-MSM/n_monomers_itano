@@ -98,7 +98,8 @@ class NMonomersSol(object):
         mons_polymer = {i: [] for i in range1(1, len(self.model.monomers))}
         x_lm_to_cp = {}  # dict, monomer of length l and highest index m to ComplexPattern
         for i, j in sp_mon.items():
-            mon_idx = self.get_number(i[-1])
+            monomer_indices = [monomer.split('_')[1] for monomer in i]
+            mon_idx = int(max(monomer_indices, key=int))
             mon_length = len(i)
             mons_polymer[mon_idx].append(i)
             x_lm_to_cp[tuple([mon_length, mon_idx])] = j
